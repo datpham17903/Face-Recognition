@@ -20,7 +20,22 @@ pip install -r requirements.txt
 
 ## Usage
 
-### 1. Build database from LFW
+### 🎯 Quick Start (GUI App)
+
+```bash
+python app.py
+```
+
+The GUI provides three tabs:
+- **Register Face**: Capture from webcam or load from image file
+- **Live Recognition**: Real-time face recognition with bounding boxes
+- **Database**: Manage registered faces, build from LFW dataset
+
+---
+
+### 💻 Command Line (Alternative)
+
+#### 1. Build database from LFW
 
 ```bash
 python build_database.py
@@ -28,7 +43,7 @@ python build_database.py
 
 Downloads LFW dataset (~233MB), extracts face embeddings, and saves to `database/`.
 
-### 2. Register a face
+#### 2. Register a face
 
 ```bash
 # From webcam (press SPACE to capture)
@@ -38,7 +53,7 @@ python register_face.py --name "Your Name"
 python register_face.py --name "Your Name" --image path/to/photo.jpg
 ```
 
-### 3. Run real-time recognition
+#### 3. Run real-time recognition
 
 ```bash
 python webcam_recognizer.py
@@ -60,12 +75,13 @@ Edit `config.py` to adjust:
 ## Project Structure
 
 ```
+├── app.py                 # 🎯 GUI Application (tkinter)
 ├── config.py              # Configuration constants
 ├── face_engine.py         # InsightFace wrapper
 ├── face_database.py       # FAISS vector database
 ├── build_database.py      # Populate DB from LFW dataset
-├── register_face.py       # Register face via webcam/image
-├── webcam_recognizer.py   # Real-time recognition
+├── register_face.py       # Register face via webcam/image (CLI)
+├── webcam_recognizer.py   # Real-time recognition (CLI)
 ├── requirements.txt
 ├── database/              # FAISS index + metadata (auto-created)
 └── data/                  # LFW dataset (auto-downloaded)

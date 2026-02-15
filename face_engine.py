@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from deepface import DeepFace
+from insightface.app import FaceAnalysis
 import config
 
 
@@ -8,43 +8,41 @@ class FaceEngine:
     def __init__(self):
         self.model_name = config.MODEL_NAME
         self.detector = config.DETECTOR_BACKEND
-
+        
+        # Initialize InsightFace with buffalo_l model for GPU acceleration
+        # Using ONNX runtime with CUDA for fast inference
+        self.app = FaceAnalysis(
+            name='buffalo_l',
+            providers=['CUDAExecutionProvider', 'CPUExecutionProvider']
+        )
+        self.app.prepare(ctx_id=0, det_size=(640, 640))
+        
     def detect_faces(self, img_bgr: np.ndarray) -> list:
-        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
         try:
-            result = DeepFace.represent(
-                img_path=img_rgb,
-                model_name=self.model_name,
-                detector_backend=self.detector,
-                enforce_detection=config.ENFORCE_DETECTION,
-            )
-            faces = []
-            for detection in result:
-                area = detection.get("facial_area", {})
-                bbox = [area.get("x", 0), area.get("y", 0), area.get("w", 0), area.get("h", 0)]
-                faces.append(bbox)
-            return faces
+            faces = self.app.get(img_bgr)
+            bboxes = []
+            for face in faces:
+                bbox = [int(face.bbox[0]), int(face.bbox[1]), 
+                        int(face.bbox[2] - face.bbox[0]), 
+                        int(face.bbox[3] - face.bbox[1])]
+                bboxes.append(bbox)
+            return bboxes
         except Exception:
             return []
 
     def extract_embeddings(
         self, img_bgr: np.ndarray
     ) -> list[tuple[np.ndarray, np.ndarray, float]]:
-        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
         try:
-            result = DeepFace.represent(
-                img_path=img_rgb,
-                model_name=self.model_name,
-                detector_backend=self.detector,
-                enforce_detection=config.ENFORCE_DETECTION,
-            )
+            faces = self.app.get(img_bgr)
             embeddings = []
-            for detection in result:
-                area = detection.get("facial_area", {})
-                x, y, w, h = area.get("x", 0), area.get("y", 0), area.get("w", 0), area.get("h", 0)
-                bbox = np.array([x, y, x + w, y + h], dtype=np.float32)
-                embedding = np.array(detection["embedding"], dtype=np.float32)
-                confidence = detection.get("confidence", 1.0)
+            for face in faces:
+                # bbox format: [x1, y1, x2, y2]
+                bbox = np.array(face.bbox, dtype=np.float32)
+                # embedding is already normalized in InsightFace
+                embedding = np.array(face.embedding, dtype=np.float32)
+                # det_score is detection confidence
+                confidence = float(face.det_score) if hasattr(face, 'det_score') else 1.0
                 embeddings.append((bbox, embedding, confidence))
             return embeddings
         except Exception:

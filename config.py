@@ -3,9 +3,9 @@
 import os
 
 # ── DeepFace ─────────────────────────────────────────────────
-MODEL_NAME = "Facenet512"        # 512-dimensional embeddings
-DETECTOR_BACKEND = "opencv"      # opencv | retinaface | mtcnn | ssd
-ENFORCE_DETECTION = True         # raise error if no face detected
+MODEL_NAME = "Facenet"         # Lighter than Facenet512, faster
+DETECTOR_BACKEND = "opencv"   # opencv | retinaface | mtcnn | ssd
+ENFORCE_DETECTION = True       # raise error if no face detected
 
 # ── Embedding ────────────────────────────────────────────────
 EMBEDDING_DIM = 512
@@ -25,4 +25,4 @@ LFW_DATA_DIR = os.path.join(BASE_DIR, "data", "lfw")
 WEBCAM_ID = 0
 WEBCAM_WIDTH = 640
 WEBCAM_HEIGHT = 480
-FRAME_SKIP = 2  # process every N-th frame for performance
+FRAME_SKIP = 5  # Skip more frames for faster FPS (higher = faster but less accurate)

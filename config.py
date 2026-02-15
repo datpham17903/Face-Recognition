@@ -2,11 +2,10 @@
 
 import os
 
-# ── InsightFace ──────────────────────────────────────────────
-MODEL_NAME = "buffalo_l"
-CTX_ID = 0            # GPU device id, -1 for CPU
-DET_SIZE = (640, 640)  # detection input size
-DET_THRESH = 0.5       # minimum detection confidence
+# ── DeepFace ─────────────────────────────────────────────────
+MODEL_NAME = "Facenet512"        # 512-dimensional embeddings
+DETECTOR_BACKEND = "opencv"      # opencv | retinaface | mtcnn | ssd
+ENFORCE_DETECTION = True         # raise error if no face detected
 
 # ── Embedding ────────────────────────────────────────────────
 EMBEDDING_DIM = 512
